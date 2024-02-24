@@ -1,1 +1,110 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
+from google.colab import drive
+drive.mount('/content/drive')
+data = pd.DataFrame(pd.read_csv('/content/drive/My Drive/Colab Notebooks/Data/D3.csv'))
+
+m = len(data)
+X1 = data.values[:, 0]
+X2 = data.values[:, 1]
+X3 = data.values[:, 2]
+y = data.values[:, 3]
+
+def compute_cost(X, y, theta):
+  predictions = X.dot(theta)
+  errors = np.subtract(predictions, y)
+  sqrErrors = np.square(errors)
+  J = 1 / (2 * m) * np.sum(sqrErrors)
+  return J
+
+def gradient_descent(X, y, theta, alpha, iterations):
+  cost_history = np.zeros(iterations)
+  for i in range(iterations):
+    predictions = X.dot(theta)
+    errors = np.subtract(predictions, y)
+    sum_delta = (alpha / m) * X.transpose().dot(errors);
+    theta = theta - sum_delta;
+    cost_history[i] = compute_cost(X, y, theta)
+  return theta, cost_history
+
+X0 = np.ones((m, 1))
+X_1 = X1.reshape(m, 1)
+X1_final = np.hstack((X0, X_1))
+
+theta = np.zeros(2)
+X1cost = compute_cost(X1_final, y, theta)
+
+print('The Cost for X1 is', X1cost)
+
+iteration = 500
+alpha = 0.05
+
+theta, cost_history = gradient_descent(X1_final, y, theta, alpha, iteration)
+
+plt.scatter(X1_final[:,1], y)
+plt.plot(X1_final[:,1], X1_final.dot(theta))
+plt.title('X1 Linear Model')
+
+plt.plot(range(1, iteration + 1),cost_history)
+plt.xlabel('Iterations')
+plt.ylabel('Cost')
+plt.title('X1 Final Regression Model')
+
+X_2 = X2.reshape(m, 1)
+X2_final = np.hstack((X0, X_2))
+X2cost = compute_cost(X2_final, y, theta)
+
+print('The Cost for X2 is', X2cost)
+
+theta, cost_history = gradient_descent(X2_final, y, theta, alpha, iteration)
+plt.scatter(X2_final[:,1], y)
+plt.plot(X2_final[:,1], X2_final.dot(theta))
+plt.title('X2 Linear Model')
+
+plt.plot(range(1, iteration + 1), cost_history)
+plt.xlabel('Iterations')
+plt.ylabel('Cost')
+plt.title('X2 Final Regression Model')
+
+X_3 = X3.reshape(m, 1)
+X3_final = np.hstack((X0, X_3))
+X3cost = compute_cost(X3_final, y, theta)
+
+print('The Cost for X3 is', X3cost)
+
+theta, cost_history = gradient_descent(X3_final, y, theta, alpha, iteration)
+plt.scatter(X3_final[:,1], y)
+plt.plot(X3_final[:,1], X3_final.dot(theta))
+plt.title('X3 Linear Model')
+
+plt.plot(range(1, iteration + 1), cost_history)
+plt.xlabel('Iterations')
+plt.ylabel('Cost')
+plt.title('X3 Final Regression Model')
+
+X_final = np.hstack((X0, X_1, X_2, X_3))
+theta = np.zeros(4)
+Xcost = compute_cost(X_final, y, theta)
+
+print('The Cost for All X Datasets =', Xcost)
+theta, cost_history = gradient_descent(X_final, y, theta, alpha, iteration)
+
+plt.plot(range(1, iteration + 1), cost_history, color='m')
+
+array1 = np.array([1,1,1,1])
+y1 = array1.dot(theta)
+print('Prediction of Y Given (1,1,1):', y1)
+
+array2 = np.array([1,2,0,4])
+y2 = array2.dot(theta)
+print('Prediction of Y Given (2,0,4):', y2)
+
+array3 = np.array([1,3,2,1])
+y3 = array3.dot(theta)
+print('Prediction of Y Given (3,2,1):', y3)
+
+plt.xlabel('Iterations')
+plt.ylabel('Cost')
+plt.title('All X Datasets Final Regression Model')
